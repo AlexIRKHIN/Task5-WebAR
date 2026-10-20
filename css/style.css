@@ -1,0 +1,172 @@
+:root {
+    --panel-bg: rgba(18, 20, 26, 0.84);
+    --fg: #f2f4f8;
+    --muted: #a6adbb;
+    --accent: #4cc38a;
+    --line: rgba(255, 255, 255, 0.14);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #14161b;
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    touch-action: manipulation;
+}
+
+#app { position: fixed; inset: 0; }
+#app canvas { display: block; }
+
+/* ---------- Корень DOM Overlay ---------- */
+/* Прозрачный и не перехватывает касания: тап мимо элементов управления
+   доходит до WebXR (select) и размещает объект. */
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+#overlay button, #overlay input, #panel { pointer-events: auto; }
+
+/* ---------- Верхняя панель ---------- */
+#topbar {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.btn {
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.10);
+    color: var(--fg);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+.btn:active { background: rgba(255, 255, 255, 0.22); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+.btn-primary { background: var(--accent); border-color: transparent; color: #08210f; font-weight: 600; }
+.btn-primary:disabled { background: rgba(255, 255, 255, 0.14); color: var(--fg); }
+.btn-primary.stop { background: #ef5350; color: #fff; }
+.btn.toggle.active, .btn.toggle[aria-pressed="true"] { background: var(--accent); color: #08210f; border-color: transparent; font-weight: 600; }
+
+/* ---------- Подсказка и статус ---------- */
+#hint, #status {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 24px);
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    font-size: 13px;
+    text-align: center;
+    pointer-events: none;
+}
+#hint { top: calc(env(safe-area-inset-top, 0px) + 62px); }
+#status { top: calc(env(safe-area-inset-top, 0px) + 102px); }
+#status.error { background: rgba(198, 40, 40, 0.9); }
+#hint:empty, #status:empty { display: none; }
+
+/* ---------- Нижняя панель управления ---------- */
+#panel {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 10px 12px 12px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+#panel.collapsed { display: none; }
+
+#tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+#tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+    flex: 0 0 auto;
+    padding: 7px 13px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+.tab-btn.active { background: rgba(255, 255, 255, 0.16); color: var(--fg); font-weight: 600; }
+
+.tab-pane { display: none; min-height: 96px; }
+.tab-pane.active { display: block; }
+
+.chips, .row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+
+.chip {
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--fg);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+.chip.active { background: var(--accent); border-color: transparent; color: #08210f; font-weight: 600; }
+
+.swatch {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    cursor: pointer;
+}
+.swatch.active { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+
+.slider { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+.slider span { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.slider b { color: var(--fg); font-weight: 600; }
+input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: var(--accent); }
+
+input.hue {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(90deg,
+        hsl(0, 75%, 50%), hsl(60, 75%, 50%), hsl(120, 75%, 50%),
+        hsl(180, 75%, 50%), hsl(240, 75%, 50%), hsl(300, 75%, 50%), hsl(360, 75%, 50%));
+}
+input.hue::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #222;
+}
+input.hue::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid #222; }
+
+/* В режиме AR скрываем элементы, которые имеют смысл только в обычном просмотре */
+body.ar-active .only-preview { display: none; }
+
+@media (min-width: 700px) {
+    #panel { bottom: 18px; }
+}

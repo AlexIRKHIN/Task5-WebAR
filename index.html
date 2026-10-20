@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WebAR Задание 5 — управление объектом</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Three.js подключён локально (папка libs), чтобы проект не зависел от CDN -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./libs/three/build/three.module.js",
+            "three/addons/": "./libs/three/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Сюда Three.js добавляет <canvas> -->
+    <div id="app"></div>
+
+    <!-- HTML-интерфейс. Этот элемент является корнем WebXR DOM Overlay,
+         поэтому остаётся поверх камеры и в режиме AR -->
+    <div id="overlay">
+        <div id="topbar">
+            <button id="btn-ar" class="btn btn-primary" disabled>Проверка AR…</button>
+            <button id="btn-menu" class="btn">Меню ▾</button>
+        </div>
+
+        <div id="hint"></div>
+        <div id="status"></div>
+
+        <div id="panel">
+            <div id="tabs">
+                <button class="tab-btn active" data-tab="model">Модель</button>
+                <button class="tab-btn" data-tab="color">Цвет</button>
+                <button class="tab-btn" data-tab="rotate">Поворот</button>
+                <button class="tab-btn" data-tab="material">Материал</button>
+                <button class="tab-btn" data-tab="light">Свет</button>
+            </div>
+
+            <!-- Модель -->
+            <section class="tab-pane active" data-pane="model">
+                <div class="chips" id="model-chips"></div>
+                <label class="slider">
+                    <span>Размер <b id="scale-val">100%</b></span>
+                    <input type="range" id="scale" min="0.3" max="2" step="0.05" value="1">
+                </label>
+            </section>
+
+            <!-- Цвет -->
+            <section class="tab-pane" data-pane="color">
+                <div class="chips" id="color-swatches"></div>
+                <label class="slider">
+                    <span>Оттенок</span>
+                    <input type="range" id="hue" class="hue" min="0" max="360" step="1" value="210">
+                </label>
+            </section>
+
+            <!-- Поворот -->
+            <section class="tab-pane" data-pane="rotate">
+                <div class="row">
+                    <button class="btn" id="rot-left">⟲ −15°</button>
+                    <button class="btn" id="rot-right">⟳ +15°</button>
+                    <button class="btn" id="rot-reset">Сброс</button>
+                    <button class="btn toggle" id="auto-rotate" aria-pressed="false">Авто-вращение</button>
+                </div>
+                <label class="slider">
+                    <span>Скорость <b id="rot-speed-val">0.8</b></span>
+                    <input type="range" id="rot-speed" min="0.1" max="3" step="0.1" value="0.8">
+                </label>
+            </section>
+
+            <!-- PBR-материал -->
+            <section class="tab-pane" data-pane="material">
+                <label class="slider">
+                    <span>Шероховатость (roughness) <b id="roughness-val">1.00</b></span>
+                    <input type="range" id="roughness" min="0" max="1" step="0.01" value="1">
+                </label>
+                <label class="slider">
+                    <span>Металличность (metalness) <b id="metalness-val">1.00</b></span>
+                    <input type="range" id="metalness" min="0" max="1" step="0.01" value="1">
+                </label>
+                <div class="row">
+                    <button class="btn" id="mat-reset">Сбросить материал</button>
+                </div>
+            </section>
+
+            <!-- HDRI-освещение -->
+            <section class="tab-pane" data-pane="light">
+                <div class="chips" id="env-chips"></div>
+                <label class="slider">
+                    <span>Экспозиция <b id="exposure-val">1.00</b></span>
+                    <input type="range" id="exposure" min="0.2" max="2.5" step="0.05" value="1">
+                </label>
+                <div class="row only-preview">
+                    <button class="btn toggle active" id="bg-toggle" aria-pressed="true">Фон HDRI</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
